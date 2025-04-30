@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: "https://portfolio-rust-omega-51.vercel.app/", // your frontend URL
+    origin: "https://portfolio-rust-omega-51.vercel.app", // your frontend URL
     methods: ["POST"],
     credentials: false,
   })
