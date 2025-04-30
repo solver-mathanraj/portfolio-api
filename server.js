@@ -9,9 +9,9 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: "https://portfolio-blush-rho-93.vercel.app/", // only allow your frontend
+    origin: "https://portfolio-blush-rho-93.vercel.app/", // your frontend URL
     methods: ["POST"],
-    allowedHeaders: ["Content-Type"],
+    credentials: false,
   })
 );
 app.use(bodyParser.json());
@@ -68,7 +68,6 @@ app.post("/send", async (req, res) => {
   </div>
   `,
     };
-
 
     const info = await transporter.sendMail(mailOptions);
     console.log("Message sent: %s", info.messageId);
