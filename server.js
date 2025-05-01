@@ -126,7 +126,7 @@ app.post("/send", async (req, res) => {
     <p>Looking forward to staying in touch!</p>
     <p>Warm regards,<br><strong>Mathan Raj</strong><br>${process.env.USER_EMAIL}</p>
     <div class="footer">
-      ©${year} Mathan Raj. All rights reserved.
+      <small>©${year} Mathan Raj. All rights reserved.</small>
     </div>
   </div>
 </body>
