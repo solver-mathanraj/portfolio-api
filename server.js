@@ -6,7 +6,7 @@ require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+const year = new Date().getFullYear();
 app.use(
   cors({
     origin: "https://portfolio-blush-rho-93.vercel.app/", // your frontend URL
@@ -76,6 +76,84 @@ app.post("/send", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Email failed to send" });
+  }
+
+  try {
+    const mailOptionsToContactor = {
+      from: `"Mathan Raj" <${process.env.USER_EMAIL}>`,
+      to: `${user_email}`,
+      subject: "Glad You Visited My Portfolio!",
+      html: `
+ <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Thank You Email</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      color: #333;
+    }
+    p {
+      color: #555;
+      line-height: 1.6;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #999;
+      text-align: center;
+    }
+    .button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 20px;
+      background-color: rgb(255, 104, 108);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <h2>Thank You for Reaching Out!</h2>
+    <p>Dear ${user_name},</p>
+    <p>Thank you for visiting my portfolio and getting in touch. I truly appreciate your interest in my work.</p>
+    <p>If you have any questions, or opportunities in mind, feel free to share more details. I’ll be happy to connect with you further.</p>
+    <a href="https://portfolio-rust-omega-51.vercel.app/" class="button">Visit My Portfolio Again</a>
+    <p>Looking forward to staying in touch!</p>
+    <p>Warm regards,<br><strong>Mathan Raj</strong><br>${process.env.USER_EMAIL}]</p>
+    <div class="footer">
+      ©${year}  Mathan Raj. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
+
+  `,
+    };
+
+    const info = await transporter.sendMail(mailOptionsToContactor);
+    console.log("Message sent: %s", info.messageId);
+
+    res.status(200).json({ message: "Email sent successfully to visitor" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Email failed to send to Visitor" });
   }
 });
 
