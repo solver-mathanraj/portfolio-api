@@ -7,6 +7,7 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 const year = new Date().getFullYear();
+
 app.use(
   cors({
     origin: "https://portfolio-rust-omega-51.vercel.app", // your frontend URL
@@ -14,6 +15,7 @@ app.use(
     credentials: false,
   })
 );
+
 app.use(bodyParser.json());
 
 // Configure real email (e.g., Gmail SMTP)
@@ -21,7 +23,7 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: process.env.USER_EMAIL, // your Gmail address
-    pass: process.env.PASS, // use Gmail App Password, not your regular password
+    pass: process.env.PASS, // use Gmail App Password, not regular password
   },
 });
 
@@ -29,17 +31,15 @@ const transporter = nodemailer.createTransport({
 app.post("/send", async (req, res) => {
   const { user_name, user_email, subject, message } = req.body;
 
-  try {
-    const mailOptions = {
-      from: `"${user_name}" <${user_email}>`,
-      to: process.env.USER_EMAIL,
-      subject: subject
-        ? "Msg from Portfolio: " + subject
-        : "New Message from Portfolio Contact Form",
-      html: `
+  const mailOptions = {
+    from: `"${user_name}" <${user_email}>`,
+    to: process.env.USER_EMAIL,
+    subject: subject
+      ? "Msg from Portfolio: " + subject
+      : "New Message from Portfolio Contact Form",
+    html: `
   <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;background:#f9f9f9;border:1px solid #ddd;padding:20px;border-radius:8px;color:#333;">
     <h2 style="text-align:center;color:#ff688c;">📨 New Message from Your Website</h2>
-
     <table style="width:100%;margin-top:20px;">
       <tr>
         <td style="padding:8px 0;"><strong>👤 Name:</strong></td>
@@ -54,37 +54,25 @@ app.post("/send", async (req, res) => {
         <td>${subject}</td>
       </tr>
     </table>
-
     <div style="margin-top:30px;">
       <strong>💬 Message:</strong>
       <div style="background:#fff;border:1px solid #ccc;padding:15px;border-radius:5px;margin-top:10px;white-space:pre-line;">
         ${message.replace(/\n/g, "<br/>")}
       </div>
     </div>
-
     <p style="margin-top:40px;font-size:12px;color:#777;text-align:center;">
       This message was sent from your website's contact form.  
     </p>
   </div>
   `,
-    };
+  };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Message sent: %s", info.messageId);
-
-    res.status(200).json({ message: "Email sent successfully" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Email failed to send" });
-  }
-
-  try {
-    const mailOptionsToContactor = {
-      from: `"Mathan Raj" <${process.env.USER_EMAIL}>`,
-      to: `${user_email}`,
-      subject: "Glad You Visited My Portfolio!",
-      html: `
- <!DOCTYPE html>
+  const mailOptionsToContactor = {
+    from: `"Mathan Raj" <${process.env.USER_EMAIL}>`,
+    to: `${user_email}`,
+    subject: "Glad You Visited My Portfolio!",
+    html: `
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
@@ -136,24 +124,28 @@ app.post("/send", async (req, res) => {
     <p>If you have any questions, or opportunities in mind, feel free to share more details. I’ll be happy to connect with you further.</p>
     <a href="https://portfolio-rust-omega-51.vercel.app/" class="button">Visit My Portfolio Again</a>
     <p>Looking forward to staying in touch!</p>
-    <p>Warm regards,<br><strong>Mathan Raj</strong><br>${process.env.USER_EMAIL}]</p>
+    <p>Warm regards,<br><strong>Mathan Raj</strong><br>${process.env.USER_EMAIL}</p>
     <div class="footer">
-      ©${year}  Mathan Raj. All rights reserved.
+      ©${year} Mathan Raj. All rights reserved.
     </div>
   </div>
 </body>
 </html>
+    `,
+  };
 
-  `,
-    };
+  try {
+    // Send both emails
+    const info1 = await transporter.sendMail(mailOptions);
+    console.log("Message sent to owner: %s", info1.messageId);
 
-    const info = await transporter.sendMail(mailOptionsToContactor);
-    console.log("Message sent: %s", info.messageId);
+    const info2 = await transporter.sendMail(mailOptionsToContactor);
+    console.log("Message sent to visitor: %s", info2.messageId);
 
-    res.status(200).json({ message: "Email sent successfully to visitor" });
+    res.status(200).json({ message: "Emails sent successfully" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Email failed to send to Visitor" });
+    console.error("Email error:", err);
+    res.status(500).json({ message: "One or both emails failed to send" });
   }
 });
 
